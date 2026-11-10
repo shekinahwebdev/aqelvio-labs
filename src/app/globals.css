@@ -1,0 +1,5036 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+/*
+ * Hero desktop composition (`hero:` / `max-hero:` variants). Keep in sync
+ * with HERO_ORBIT_DESKTOP.query and the `.hero-card-size` media query below.
+ */
+@theme {
+  --breakpoint-hero: 82rem;
+}
+
+@theme inline {
+  --color-background: var(--aq-bg);
+  --color-surface: var(--aq-surface);
+  --color-elevated: var(--aq-elevated);
+  --color-elevated-2: var(--aq-elevated-2);
+  --color-gunmetal: var(--aq-gunmetal);
+  --color-foreground: var(--aq-text);
+  --color-muted: var(--aq-text-muted);
+  --color-accent: var(--aq-accent);
+  --color-border: var(--aq-border);
+  --color-border-subtle: var(--aq-border-subtle);
+  --color-hover: var(--aq-hover);
+  --color-focus: var(--aq-focus);
+  --color-error: var(--aq-error);
+  --color-success: var(--aq-success);
+
+  --font-sans: var(--font-inter), "Helvetica Neue", sans-serif;
+  --font-display: var(--font-space-grotesk), "Segoe UI", sans-serif;
+
+  --text-display: var(--aq-text-display);
+  --text-display--line-height: var(--leading-display);
+  --text-display--letter-spacing: var(--tracking-display);
+  --text-display--font-weight: 500;
+
+  --text-h1: var(--aq-text-h1);
+  --text-h1--line-height: var(--leading-heading);
+  --text-h1--letter-spacing: var(--tracking-heading);
+  --text-h1--font-weight: 500;
+
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: var(--tracking-label);
+  --text-label--font-weight: 500;
+}
+
+html {
+  background: var(--aq-bg);
+  color: var(--aq-text);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Lenis (desktop only, see SmoothScroll) owns the easing; the browser must
+   not animate its programmatic scrolls a second time. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
+html.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/*
+ * Page scrollbar — the native viewport scrollbar, restyled. Only on
+ * mouse/trackpad devices (touch keeps the platform overlay) and never in
+ * forced-colors mode (the system scrollbar stays). `html::` selectors reach
+ * the viewport scrollbar only, so nested scroll areas (the menu) keep theirs.
+ * The track is always shown so the page never shifts as the scrollbar comes
+ * and goes (menu scroll lock, pages shorter than the viewport):
+ * `scrollbar-gutter` can't be used, as Chromium sizes it from the platform
+ * scrollbar (0px when macOS uses overlay scrollbars), not this one.
+ */
+@media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+  html {
+    --scrollbar-track: #050505;
+    --scrollbar-thumb: linear-gradient(180deg, #3a3a3d, #8d8d92);
+    --scrollbar-thumb-hover: linear-gradient(180deg, #b4b4b8, #ececee);
+    --scrollbar-thumb-active: linear-gradient(180deg, #d6d6d9, #f6f6f7);
+    overflow-y: scroll;
+  }
+
+  /* While the menu holds the scroll lock (body is fixed, so there is nothing
+     to scroll) keep the empty track rather than clipping it away. */
+  html.lenis.lenis-stopped {
+    overflow: hidden scroll;
+  }
+
+  html::-webkit-scrollbar {
+    width: 6px;
+    background: var(--scrollbar-track);
+  }
+
+  html::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  html::-webkit-scrollbar-thumb {
+    min-height: 48px;
+    border-radius: 999px;
+    background: var(--scrollbar-thumb);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  }
+
+  html::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  html::-webkit-scrollbar-thumb:active {
+    background: var(--scrollbar-thumb-active);
+  }
+
+  html::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  html::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Firefox. Chromium/Safari skip the pseudo-elements above once these are
+     set, so they only apply where the pseudo-elements don't exist. */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: #8d8d92 var(--scrollbar-track);
+    }
+
+    /* scrollbar-color inherits; keep nested scroll areas native. */
+    body {
+      scrollbar-color: auto;
+    }
+  }
+}
+
+/* Native anchor jumps (e.g. a hash typed in the address bar) clear the sticky header. */
+main [id] {
+  scroll-margin-top: var(--header-height);
+}
+
+body {
+  min-height: 100%;
+  background: var(--aq-bg);
+  color: var(--aq-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: -0.02em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--aq-accent) 40%, transparent);
+  color: var(--aq-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+/* HERO_STYLES */
+
+.hero-nav {
+  animation: aq-fade-only var(--duration-reveal) var(--ease-out) both;
+}
+
+.mobile-menu-panel {
+  animation: aq-fade-up var(--duration-mid) var(--ease-out) both;
+}
+
+.mobile-menu-item {
+  animation: aq-fade-up var(--duration-reveal) var(--ease-out) both;
+}
+
+@keyframes aq-tick-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes aq-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes aq-fade-only {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hero-label-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+.hero-label-marquee {
+  animation: hero-label-marquee 15s linear infinite;
+}
+
+/*
+ * Hero composition controls — each one independent.
+ *
+ *   --hero-card-w       orbit card width (height/radius keep 148:168:22)
+ *   --hero-ring-d       tick-ring diameter
+ *   --hero-name-size    "Aqelvio" font size
+ *   --hero-labs-size    "Labs" font size
+ *   --hero-center-y     ring centre, measured down from the hero's top edge
+ *   --hero-orbit-scale  multiplier on the orbit radii (HERO_ORBIT_DESKTOP)
+ *
+ * Below the hero breakpoint (82rem) everything is a fraction of the orbit stage's own width
+ * (cqw resolves against the stage, an inline-size container), so cards,
+ * radii, tick ring and type always agree. Cards and type are set
+ * independently. Orbit radii (--hero-orbit-axis / -diagonal, × stage width)
+ * are read by HeroOrbit too. These fractions keep upright cards ≥11px apart
+ * and clear of the tick ring at every orbit angle, inside the stage width.
+ */
+.hero-card-size {
+  --hero-card-w: 15cqw;
+  --hero-card-h: calc(var(--hero-card-w) * 168 / 148);
+  --hero-card-r: calc(var(--hero-card-w) * 22 / 148);
+  --hero-ring-d: 38cqw;
+  --hero-name-size: 7.1cqw;
+  --hero-labs-size: 4.9cqw;
+  --hero-orbit-axis: 0.39;
+  --hero-orbit-diagonal: 0.415;
+  --hero-orbit-scale: 1;
+}
+
+@media (min-width: 480px) {
+  .hero-card-size {
+    --hero-card-w: 18cqw;
+  }
+}
+
+/*
+ * Desktop: Qubix proportions, measured at matched viewports (1366–1920px,
+ * all identical — the reference is fixed-pixel): card 148, ring 342,
+ * heading 64 / secondary 44 (line-height 1.24), ring centre 451.5px below
+ * the header. `--hero-u` expresses those in units of our card width so the
+ * centre scales with the cards instead of the viewport-fitting stage.
+ * The wordmark is set at 60/148 of the card (Qubix: 64) because "Aqelvio" is
+ * ~40% wider than "Qubix"; "Labs" keeps the reference 0.6875 hierarchy.
+ */
+@media (min-width: 82rem) {
+  .hero-card-size {
+    --hero-card-w: min(163px, calc((100svh - var(--header-height) - 1.5rem) * 0.2066));
+    --hero-u: calc(var(--hero-card-w) / 148);
+    --hero-ring-d: calc(342 * var(--hero-u));
+    --hero-name-size: calc(60 * var(--hero-u));
+    --hero-labs-size: calc(41.25 * var(--hero-u));
+    --hero-center-y: calc(451.5 * var(--hero-u));
+  }
+}
+
+/* Qubix “Hero Load Anim” (Webflow a-54). Played when [data-hero-play=true]. */
+.hero-name {
+  transform: translate3d(0, 32%, 0) scale(1.5);
+  transform-origin: center;
+}
+
+.hero-labs {
+  opacity: 0;
+  filter: blur(20px);
+  transform: translate3d(0, 100%, 0);
+}
+
+.hero-ring {
+  opacity: 0;
+  transform: rotate(15deg);
+}
+
+.hero-orbit-fade,
+.hero-rail {
+  opacity: 0;
+  filter: blur(20px);
+}
+
+[data-hero-play="true"] .hero-name {
+  transform: none;
+  transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.4s;
+}
+
+[data-hero-play="true"] .hero-labs {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+  transition:
+    transform 0.6s ease-out 0.5s,
+    opacity 0.5s ease-in 0.5s,
+    filter 0.5s ease-in 0.5s;
+}
+
+[data-hero-play="true"] .hero-ring {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.4s,
+    transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) 0.4s;
+}
+
+[data-hero-play="true"] .hero-orbit-fade,
+[data-hero-play="true"] .hero-rail {
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 1s,
+    filter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 1s;
+}
+
+[data-hero-reduce="true"] .hero-name,
+[data-hero-reduce="true"] .hero-labs,
+[data-hero-reduce="true"] .hero-ring,
+[data-hero-reduce="true"] .hero-orbit-fade,
+[data-hero-reduce="true"] .hero-rail {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: none;
+}
+
+@keyframes hero-mouse-bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 6px, 0);
+  }
+}
+
+.hero-mouse-bob {
+  animation: hero-mouse-bob 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-tick,
+  .hero-brand-name,
+  .hero-brand-labs,
+  .hero-footer-copy,
+  .hero-label-marquee,
+  .hero-mouse-bob,
+  .hero-name,
+  .hero-labs,
+  .hero-ring,
+  .hero-orbit-fade,
+  .hero-rail,
+  .hero-nav,
+  .mobile-menu-panel,
+  .mobile-menu-item {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+}
+
+/*
+ * Services sphere (ServicesSphere). `--p` 0→1 is scroll progress, set by the
+ * component; the settled state (1) is the default and the reduced-motion
+ * state. Start: half size, offset down-left by half the shape's width;
+ * only the rings rotate.
+ */
+.services-sphere {
+  --p: 1;
+  transform: translate3d(calc((var(--p) - 1) * 50%), calc((1 - var(--p)) * 50%), 0)
+    scale(calc(0.5 + var(--p) * 0.5));
+  will-change: transform;
+}
+
+.services-sphere-rings {
+  transform: rotate(calc(var(--p) * 280deg));
+  transform-origin: 100px 100px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-sphere {
+    --p: 1 !important;
+    will-change: auto;
+  }
+}
+
+/*
+ * Collaboration reveal (CollaborationReveal). `--collab-size` is fitted in
+ * JS (the clamp is the no-JS size); `--img-p` 0→1 is scroll progress and
+ * drives only the image inside the letters (slow zoom-out and drift). Its
+ * default, 1, is the settled state.
+ */
+.collab-stage {
+  --collab-size: clamp(2.75rem, 11cqi, 11rem);
+  --img-p: 1;
+}
+
+.collab-fill {
+  font-family: var(--font-sans);
+  font-size: var(--collab-size);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  color: var(--aq-text);
+}
+
+/* Scroll sequence on: the stage sticks below the header for --collab-pin
+   extra stage heights; then the section ends and the stage scrolls away. */
+[data-collab-pin] {
+  --collab-stage-h: calc(100svh - var(--header-height));
+  height: calc(var(--collab-stage-h) * (1 + var(--collab-pin)));
+}
+
+[data-collab-pin] .collab-stage {
+  position: sticky;
+  top: var(--header-height);
+  height: var(--collab-stage-h);
+  padding-block: 0;
+}
+
+.collab-stage[data-wrap="false"] .collab-fill {
+  white-space: nowrap;
+}
+
+/* Glyph tops and descenders (q, p) stay inside the clip; no horizontal clip. */
+.collab-mask {
+  padding-block: 0.06em 0.16em;
+  margin-block: -0.06em -0.16em;
+  font-size: var(--collab-size);
+  clip-path: inset(0 -100vw);
+}
+
+.collab-connector {
+  margin-block: max(0.75rem, calc(var(--collab-size) * 0.14));
+  font-size: max(0.9375rem, calc(var(--collab-size) * 0.13));
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .collab-fill {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    /* The gradient shows through if the image hasn't loaded. */
+    background-image: var(--collab-img), linear-gradient(120deg, #e2531a, #ff9a3c 55%, #b9c3cf);
+    background-size: cover;
+    background-position: center;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  @media (max-width: 767px) {
+    .collab-fill {
+      background-image: var(--collab-img-small), linear-gradient(120deg, #e2531a, #ff9a3c 55%, #b9c3cf);
+    }
+  }
+
+  .collab-stage[data-fill="measured"] .collab-fill {
+    --img-zoom: calc(1.12 - 0.1 * var(--img-p));
+    background-size: calc(var(--fill-w) * var(--img-zoom)) calc(var(--fill-h) * var(--img-zoom));
+    background-position:
+      calc(var(--fill-x) - var(--fill-w) * (var(--img-zoom) - 1) / 2 + (0.5 - var(--img-p)) * 0.06 * var(--fill-w))
+      calc(var(--fill-y) - var(--fill-h) * (var(--img-zoom) - 1) / 2);
+  }
+}
+
+@media (forced-colors: active) {
+  .collab-fill {
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+    background: none;
+  }
+}
+
+/*
+ * Services showcase (ServicesShowcase). The default is the normal-flow
+ * layout (phones, reduced motion, no JS); [data-showcase="scroll"] is the
+ * pinned horizontal gallery from 768px upward. --track-h is one gallery track:
+ * two tracks stack inside the stage with room above and below.
+ */
+.showcase-strip {
+  display: grid;
+  gap: 3rem 1.5rem;
+}
+
+.showcase-frame {
+  aspect-ratio: 16 / 10;
+}
+
+.showcase-item[data-size="compact"] .showcase-frame {
+  aspect-ratio: 4 / 3;
+}
+
+.showcase-info {
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .showcase-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .showcase-item:nth-child(2n) {
+    margin-top: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .showcase-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .showcase-item:nth-child(2n) {
+    margin-top: 0;
+  }
+
+  .showcase-item:nth-child(3n + 2) {
+    margin-top: 6rem;
+  }
+}
+
+[data-showcase="scroll"] .showcase-stage {
+  --track-h: min(19.125rem, calc((100svh - var(--header-height) - 7rem) / 2));
+  --frame-h: calc(var(--track-h) - 4.25rem);
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100svh - var(--header-height));
+  max-width: none;
+  padding-block: 0;
+  overflow: clip;
+}
+
+/* Panels and labels dissolve at the stage edges rather than being cut. */
+[data-showcase="scroll"] .showcase-stage::before,
+[data-showcase="scroll"] .showcase-stage::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  z-index: 2;
+  width: min(2rem, calc(var(--container-pad) * 0.8));
+  pointer-events: none;
+}
+
+[data-showcase="scroll"] .showcase-stage::before {
+  left: 0;
+  background: linear-gradient(90deg, #080808, transparent);
+}
+
+[data-showcase="scroll"] .showcase-stage::after {
+  right: 0;
+  background: linear-gradient(270deg, #080808, transparent);
+}
+
+/*
+ * The title and note each sit in a band no label enters. Tablet (labels under
+ * panels): title above the upper track, note below the lower labels.
+ * Desktop (labels beside, top-aligned): title along the lower track's
+ * bottom edge, where only images pass over it; note in the top band.
+ */
+[data-showcase="scroll"] .showcase-title-wrap {
+  position: absolute;
+  top: calc((50% - var(--track-h)) / 2);
+  left: var(--container-pad);
+  translate: 0 -50%;
+  z-index: 0;
+}
+
+[data-showcase="scroll"] .showcase-strip {
+  position: absolute;
+  top: calc(50% - var(--track-h));
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+  width: max-content;
+  margin: 0;
+}
+
+[data-showcase="scroll"] .showcase-item,
+[data-showcase="scroll"] .showcase-item:nth-child(n) {
+  margin-top: 0;
+}
+
+[data-showcase="scroll"] .showcase-item[data-track="lower"] {
+  margin-top: var(--track-h);
+}
+
+/* Tablet: labels under the panel. */
+[data-showcase="scroll"] .showcase-frame {
+  aspect-ratio: auto;
+  height: var(--frame-h);
+  width: calc(var(--frame-h) * 1.92);
+}
+
+[data-showcase="scroll"] .showcase-item[data-size="compact"] .showcase-frame {
+  height: calc(var(--frame-h) * 0.72);
+  width: calc(var(--frame-h) * 0.72 * 1.51);
+}
+
+[data-showcase="scroll"] .showcase-info {
+  margin-top: 0.75rem;
+}
+
+[data-showcase="scroll"] .showcase-note {
+  position: absolute;
+  left: var(--container-pad);
+  top: calc(50% + var(--track-h) + (50% - var(--track-h)) / 2);
+  translate: 0 -50%;
+  margin: 0;
+  z-index: 2;
+}
+
+/* Desktop: labels beside the panel, top-aligned, as in the reference. */
+@media (min-width: 1024px) {
+  [data-showcase="scroll"] .showcase-stage {
+    --frame-h: var(--track-h);
+  }
+
+  [data-showcase="scroll"] .showcase-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  [data-showcase="scroll"] .showcase-item[data-size="compact"] .showcase-frame {
+    height: calc(var(--frame-h) * 0.693);
+    width: calc(var(--frame-h) * 0.693 * 1.51);
+  }
+
+  [data-showcase="scroll"] .showcase-info {
+    width: 9.5rem;
+    margin-top: 0;
+  }
+
+  [data-showcase="scroll"] .showcase-title-wrap {
+    top: auto;
+    bottom: calc(50% - var(--track-h));
+    translate: none;
+  }
+
+  [data-showcase="scroll"] .showcase-note {
+    left: auto;
+    right: var(--container-pad);
+    top: calc((50% - var(--track-h)) / 2);
+    max-width: none;
+    text-align: right;
+  }
+}
+
+/*
+ * "What We Do" (WhatWeDo). --cube is the cube's edge. Perspective is
+ * 2.8125 edges (the reference: 900px for a 320px cube). Each face's
+ * transform follows the reference's order exactly: position on its plane,
+ * twist (--tw × --twist-deg), hinge, shear (--sk × --skew-deg), about its
+ * own transform origin (set inline from data). --sep scales each face's
+ * images inside it (1 joined → 0.7 separate planes).
+ *
+ * The open sculpture spans ~2.1 edges across, so --cube is sized to keep
+ * that clear of the words and the three groups (checked frame by frame in
+ * the verification run); overflow-x: clip is only a safety net and does
+ * not break the sticky pin.
+ */
+.wwd {
+  overflow-x: clip;
+}
+
+.wwd-stage {
+  --cube: min(12rem, 46vw);
+}
+
+.wwd-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.28em;
+  font-size: clamp(2.75rem, 1.6rem + 5vw, 6.25rem);
+  line-height: 1;
+  text-align: center;
+}
+
+.wwd-word {
+  white-space: nowrap;
+}
+
+.wwd-visual {
+  display: block;
+  order: 3;
+  flex-basis: 100%;
+  height: calc(var(--cube) * 2.6);
+  margin-top: 2rem;
+  pointer-events: none;
+}
+
+.wwd-entrance,
+.wwd-scene {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.wwd-scene {
+  perspective: calc(var(--cube) * 2.8125);
+  perspective-origin: 50% 50%;
+}
+
+.wwd-cube {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+.wwd-face {
+  position: absolute;
+  top: calc(var(--cube) / -2);
+  left: calc(var(--cube) / -2);
+  width: var(--cube);
+  height: var(--cube);
+  transform-style: preserve-3d;
+  transform:
+    translate3d(0, 0, calc(var(--z) * var(--cube)))
+    rotate(calc(var(--tw) * var(--twist-deg)))
+    var(--hinge)
+    skew(0deg, calc(var(--sk) * var(--skew-deg)));
+}
+
+/* Two upright sides per face: the inner one is turned to face the other way,
+   so neither side is ever seen mirrored, and no face shows a blank back. */
+.wwd-side {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  transform: scale(var(--sep));
+}
+
+.wwd-side--inner {
+  transform: rotateY(180deg) scale(var(--sep));
+}
+
+/* The glowing core: small blurred planes at the centre, like the reference's. */
+.wwd-core {
+  position: absolute;
+  top: calc(var(--cube) * -0.075);
+  left: calc(var(--cube) * -0.075);
+  width: calc(var(--cube) * 0.15);
+  height: calc(var(--cube) * 0.15);
+  background: radial-gradient(circle, #ffd2b0, #fe6512 55%, #8a2c06);
+  filter: blur(calc(var(--cube) * 0.2)) brightness(1.5);
+  transform: rotateX(-45deg);
+}
+
+.wwd-core[data-tilt="up"] {
+  transform: rotateX(45deg);
+}
+
+.wwd-items {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 3rem;
+}
+
+/*
+ * Under 1024px with motion: the heading and sculpture pin for the same
+ * distance as on desktop (the reference pins at every width); the three
+ * groups follow the pin.
+ */
+@media (max-width: 1023px) {
+  [data-wwd="scroll"] .wwd-pin {
+    height: calc((var(--wwd-pin) + 2) * 100svh);
+  }
+
+  [data-wwd="scroll"] .wwd-heading {
+    position: sticky;
+    top: var(--header-height);
+    height: calc(100svh - var(--header-height));
+    align-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .wwd-stage {
+    --cube: 15rem;
+  }
+
+  .wwd-items {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+/*
+ * Desktop: "What" | cube | "We Do" across the middle; the three groups in
+ * three corners, outside the cube's full range of motion (measured in the
+ * verification run). The cube is 368px at 1440×900 (the reference: 320px).
+ * The sticky pin applies only with motion ([data-wwd="scroll"]).
+ */
+@media (min-width: 1024px) {
+  .wwd-stage {
+    --stage-h: calc(100svh - var(--header-height));
+    --cube: min(23rem, 25.5vw, calc(var(--stage-h) * 0.46));
+    height: clamp(42rem, var(--stage-h), 60rem);
+    padding-block: 0;
+  }
+
+  .wwd-pin {
+    display: contents;
+  }
+
+  .wwd-heading {
+    position: absolute;
+    inset: 0;
+    flex-wrap: nowrap;
+    column-gap: 0;
+    font-size: clamp(3.25rem, 0.5rem + 5vw, 6rem);
+  }
+
+  .wwd-visual {
+    order: 0;
+    flex: none;
+    width: calc(var(--cube) * 2.25);
+    height: calc(var(--cube) * 2.25);
+    margin: 0;
+  }
+
+  .wwd-items {
+    display: block;
+    margin: 0;
+  }
+
+  .wwd-item {
+    position: absolute;
+    max-width: min(18rem, 24vw);
+  }
+
+  .wwd-item[data-index="0"] {
+    top: 7%;
+    left: var(--container-pad);
+  }
+
+  .wwd-item[data-index="1"] {
+    top: 7%;
+    right: var(--container-pad);
+  }
+
+  .wwd-item[data-index="2"] {
+    bottom: 7%;
+    left: var(--container-pad);
+  }
+
+  /* (pin + 2) viewports tall with the range ending "bottom bottom": the
+     reference's scrubbed distance unit for unit (see cubeMotion). */
+  [data-wwd="scroll"] {
+    height: calc((var(--wwd-pin) + 2) * 100svh);
+  }
+
+  [data-wwd="scroll"] .wwd-stage {
+    position: sticky;
+    top: var(--header-height);
+    height: var(--stage-h);
+  }
+}
+
+/*
+ * "A Few Of Our Recent Projects" (RecentProjects). Static by default
+ * (reduced motion / no JS): each panel in normal flow at a fixed ratio.
+ * [data-rp="scroll"] switches to the reference's framing: viewport-tall
+ * panels with a 90vw × 90svh frame. The curved title's font size is in
+ * the SVG's user units (viewBox width 1515), as in the reference: 6rem
+ * on desktop, 7rem under 992px, 10rem under 480px.
+ */
+.rp {
+  --rp-inset: clamp(0.75rem, 2vw, 1.5rem);
+  overflow-x: clip;
+  background: #060606;
+}
+
+.rp-intro {
+  display: grid;
+  gap: 2.5rem;
+  padding-block: clamp(6rem, 11vw, 10rem) clamp(3rem, 5vw, 4rem);
+}
+
+.rp-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 1.1rem + 6.4vw, 7rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--aq-text);
+}
+
+.rp-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.rp-char {
+  display: inline-block;
+}
+
+.rp-aside {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.25rem;
+}
+
+.rp-arrow {
+  flex: none;
+  width: clamp(3.5rem, 2rem + 5vw, 7.5rem);
+  height: auto;
+  color: var(--aq-text);
+}
+
+.rp-arrow-link {
+  display: block;
+  border-radius: var(--radius-card);
+}
+
+.rp-arrow-link:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 4px;
+}
+
+.rp-body {
+  max-width: 17rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--aq-text-muted);
+}
+
+@media (min-width: 1024px) {
+  .rp-intro {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+
+  .rp-aside {
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    padding-bottom: 0.75rem;
+  }
+}
+
+.rp-list {
+  display: grid;
+  gap: 3rem;
+  padding-bottom: var(--section-space);
+}
+
+.rp-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: var(--container-pad);
+}
+
+.rp-frame {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #111;
+}
+
+@media (min-width: 768px) {
+  .rp-frame {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+[data-rp="scroll"] .rp-list {
+  gap: 0;
+}
+
+[data-rp="scroll"] .rp-panel {
+  height: 100svh;
+  padding: 0;
+}
+
+[data-rp="scroll"] .rp-frame {
+  position: absolute;
+  width: 90vw;
+  height: 90svh;
+  max-width: none;
+  aspect-ratio: auto;
+}
+
+/* The curved, repeated title. Decorative and click-through. */
+.rp-title {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: 6rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  fill: var(--rp-title-color);
+}
+
+@media (max-width: 991px) {
+  .rp-title {
+    font-size: 7rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .rp-title {
+    font-size: 10rem;
+  }
+}
+
+/* Category, status and the concept label: real text, always legible. */
+.rp-meta {
+  position: absolute;
+  bottom: var(--rp-inset);
+  left: var(--rp-inset);
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-pill);
+  background: rgb(8 8 8 / 0.62);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font-size: 0.75rem;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: var(--aq-text);
+  pointer-events: none;
+}
+
+.rp-meta-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+/* With a static "View Work" tag in the corner (touch, reduced motion),
+   the meta sits above it rather than beside it. */
+.rp:not([data-rp-tag="follow"]) .rp-frame:has(.rp-link) .rp-meta {
+  bottom: calc(var(--rp-inset) + 2.75rem);
+}
+
+/* Credit / concept label inside the meta pill. */
+.rp-chip {
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--aq-border);
+  border-radius: var(--radius-pill);
+  color: var(--aq-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.6875rem;
+}
+
+/* Only when a project has a real action (link, or the lightbox button). */
+.rp-link {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  /* Focus scrolling keeps the whole ring clear of the sticky header. */
+  scroll-margin-block: calc(var(--header-height) + 0.5rem) 0.5rem;
+}
+
+.rp-link:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: -6px;
+}
+
+/* The ring lives inside the clipped frame; while it has keyboard focus the
+   frame shows whole so the ring is never cut by the scrubbed shape. */
+.rp-frame:has(.rp-link:focus-visible) {
+  clip-path: none !important;
+}
+
+/* Static by default (touch, reduced motion): visible without hover. */
+.rp-tag {
+  position: absolute;
+  right: var(--rp-inset);
+  bottom: var(--rp-inset);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-width: 8rem;
+  height: 2.25rem;
+  padding-inline: 1.125rem;
+  white-space: nowrap;
+  border-radius: 1.125rem;
+  background: rgb(10 10 10 / 0.58);
+  -webkit-backdrop-filter: blur(2rem);
+  backdrop-filter: blur(2rem);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #f5f5f5;
+  pointer-events: none;
+}
+
+/* Fine pointer with motion: positioned by RecentProjects (follows the pointer). */
+[data-rp-tag="follow"] .rp-tag {
+  right: auto;
+  bottom: auto;
+}
+
+/*
+ * Cover media. Screenshots and video fill the frame ("cover"); finished
+ * artwork is shown whole ("contain") over a small pre-blurred copy of
+ * itself, so posters keep their type, logos and proportions. Portrait
+ * viewports can swap the image (<picture>) and the fit.
+ */
+.rp-cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.rp-backdrop {
+  position: absolute;
+  inset: -4%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px) brightness(0.72);
+}
+
+.rp-art {
+  position: absolute;
+  inset: 0;
+}
+
+.rp-cover[data-fit="contain"] .rp-art {
+  inset: clamp(1rem, 4.5%, 3rem);
+}
+
+.rp-cover-img,
+.rp-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--rp-pos);
+}
+
+.rp-cover[data-fit="contain"] :is(.rp-cover-img, .rp-video) {
+  object-fit: contain;
+}
+
+@media (orientation: portrait) {
+  :is(.rp-cover-img, .rp-video) {
+    object-position: var(--rp-pos-portrait);
+  }
+
+  .rp-cover[data-portrait-fit="contain"] :is(.rp-cover-img, .rp-video) {
+    object-fit: contain;
+  }
+
+  .rp-cover[data-portrait-fit="cover"] :is(.rp-cover-img, .rp-video) {
+    object-fit: cover;
+  }
+}
+
+/* The poster (the cover image) shows until the video has a frame. */
+.rp-video {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.rp-video[data-started] {
+  opacity: 1;
+}
+
+/* Play / pause for the muted preview: above the panel's action, in the
+   bottom corner (the top of the frame sits under the sticky header). A
+   static action tag moves left to make room. */
+.rp-play {
+  position: absolute;
+  right: var(--rp-inset);
+  bottom: var(--rp-inset);
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 50%;
+  background: rgb(10 10 10 / 0.62);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: #f5f5f5;
+  cursor: pointer;
+}
+
+.rp:not([data-rp-tag="follow"]) .rp-frame:has(.rp-play) .rp-tag {
+  right: calc(var(--rp-inset) + 3.375rem);
+  bottom: calc(var(--rp-inset) + 0.25rem);
+}
+
+.rp-play:hover {
+  background: rgb(10 10 10 / 0.8);
+}
+
+.rp-play:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+.rp-frame:has(.rp-play:focus-visible) {
+  clip-path: none !important;
+}
+
+.rp-play[data-failed] {
+  border-color: var(--aq-accent);
+  color: var(--aq-accent);
+}
+
+/* Said on screen when the preview cannot play, just above its button. */
+.rp-play-note {
+  position: absolute;
+  right: var(--rp-inset);
+  bottom: calc(var(--rp-inset) + 3.25rem);
+  z-index: 5;
+  border-radius: 999px;
+  background: rgb(10 10 10 / 0.78);
+  color: #f5f5f5;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  padding: 0.4rem 0.75rem;
+}
+
+.rp-play-note:empty {
+  display: none;
+}
+
+.wk .rp-play-note {
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: calc(clamp(1rem, 3vw, 2rem) + 3.25rem);
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared video player (VideoPlayer): native controls, and a large Play */
+/* button over the poster until the first play. The box's size and     */
+/* position come from the class it is given (.pd-video, .sv-video, …).  */
+/* ------------------------------------------------------------------ */
+.vp-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.vp-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  translate: -50% -50%;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 999px;
+  background: rgb(10 10 10 / 0.66);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: #f5f5f5;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem 0.5rem 0.5rem;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.vp-play:hover {
+  background: rgb(10 10 10 / 0.84);
+}
+
+.vp-play:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+.vp-play-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: #f5f5f5;
+  color: #0a0a0a;
+  padding-left: 0.15rem;
+}
+
+.vp-problem {
+  position: absolute;
+  inset: auto 0.75rem 3.75rem;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.vp-problem:empty {
+  display: none;
+}
+
+.vp-problem p {
+  max-width: 34rem;
+  margin: 0;
+  border-radius: 0.75rem;
+  background: rgb(10 10 10 / 0.86);
+  color: #f5f5f5;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  padding: 0.75rem 1rem;
+  pointer-events: auto;
+  text-align: center;
+}
+
+.vp-problem :is(button, a) {
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* "View Project" lightbox: a native modal <dialog>, full viewport. */
+.rp-lightbox {
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgb(5 5 5 / 0.96);
+  color: var(--aq-text);
+  overscroll-behavior: contain;
+}
+
+.rp-lightbox::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+
+.rp-lightbox-inner {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  height: 100%;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.rp-lightbox-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.rp-lightbox-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.rp-lightbox-meta {
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--aq-text-muted);
+}
+
+.rp-lightbox-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  margin: 0;
+}
+
+.rp-lightbox-media {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.rp-lightbox-video {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.rp-lightbox-video .vp-media {
+  background: #000;
+}
+
+.rp-lightbox-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.rp-lightbox-count {
+  min-width: 3.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--aq-text-muted);
+}
+
+.rp-lightbox-btn {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--aq-border);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.04);
+  color: var(--aq-text);
+  cursor: pointer;
+}
+
+.rp-lightbox-btn:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
+.rp-lightbox-btn:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ */
+/* FAQs — after the reference: centred heading, wide bordered rows,  */
+/* a plus whose vertical stroke turns to make a minus, 0.5s height.   */
+/* ------------------------------------------------------------------ */
+.faq {
+  --faq-ease: cubic-bezier(0.37, 0, 0.63, 1); /* sine.inOut */
+  --faq-time: 0.5s;
+  background: #050505;
+  padding-block: clamp(6rem, 11vw, 9rem);
+}
+
+.faq-head {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  text-align: center;
+}
+
+.faq-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 1.6rem + 3.6vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--aq-text);
+}
+
+.faq-intro {
+  max-width: 25rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.faq-list {
+  display: grid;
+  gap: clamp(0.75rem, 1.6vw, 1.25rem);
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+.faq-item {
+  border: 1px solid rgb(255 255 255 / 0.09);
+  border-radius: 0.375rem;
+  background: rgb(255 255 255 / 0.02);
+  transition: border-color 0.3s ease;
+}
+
+.faq-item:hover,
+.faq-item[data-open] {
+  border-color: rgb(255 255 255 / 0.18);
+}
+
+.faq-q {
+  margin: 0;
+  font: inherit;
+}
+
+.faq-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  padding: clamp(1.25rem, 2.4vw, 1.625rem) clamp(1.25rem, 3vw, 2rem);
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  color: var(--aq-text);
+  font-family: var(--font-display);
+  font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.3125rem);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-toggle:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+.faq-icon {
+  position: relative;
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.faq-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  margin-top: -0.5px;
+  background: currentColor;
+}
+
+.faq-line-v {
+  transform: rotate(90deg);
+  transition: transform var(--faq-time) var(--faq-ease);
+}
+
+/* Plus → minus: the vertical stroke turns flat onto the horizontal one. */
+.faq-item[data-open] .faq-line-v {
+  transform: rotate(180deg);
+}
+
+.faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--faq-time) var(--faq-ease),
+    opacity var(--faq-time) var(--faq-ease),
+    visibility 0s linear var(--faq-time);
+}
+
+.faq-item[data-open] .faq-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--faq-time) var(--faq-ease),
+    opacity var(--faq-time) var(--faq-ease),
+    visibility 0s;
+}
+
+.faq-panel-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.faq-answer {
+  max-width: 40rem;
+  padding: 0 clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 2.4vw, 1.75rem);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--aq-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-item,
+  .faq-line-v,
+  .faq-panel,
+  .faq-item[data-open] .faq-panel {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Image-wall call to action (CtaWall). Static final state by default;  */
+/* [data-cw="scroll"] makes the section tall and the stage sticky.      */
+/* ------------------------------------------------------------------ */
+.cw {
+  position: relative;
+  background: #050505;
+}
+
+.cw-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+[data-cw="scroll"] {
+  height: calc((1 + var(--cw-distance, 2.9)) * 100svh);
+}
+
+[data-cw="scroll"] .cw-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+}
+
+.cw-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1vw;
+  perspective: 1000px;
+  pointer-events: none;
+}
+
+.cw-cell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: #111;
+}
+
+.cw-img {
+  object-fit: cover;
+}
+
+@media (max-width: 767px) {
+  .cw-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.375rem;
+  }
+
+  .cw-cell {
+    border-radius: 0.25rem;
+  }
+
+  .cw-cell:not([data-compact]) {
+    display: none;
+  }
+}
+
+.cw-overlay {
+  position: absolute;
+  inset: 0;
+  background: #050505;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.cw-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+  padding: calc(var(--header-height) + 2rem) var(--container-pad) 3rem;
+  text-align: center;
+}
+
+.cw-title {
+  max-width: 13ch;
+  font-family: var(--font-display);
+  font-size: clamp(2.875rem, 1.2rem + 6.2vw, 6.5rem);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+  color: var(--aq-text);
+}
+
+.cw-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.cw-char {
+  display: inline-block;
+}
+
+.cw-credit {
+  max-width: 30rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--aq-text-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Footer — statement and links above an oversized wordmark.           */
+/* ------------------------------------------------------------------ */
+.ft {
+  background: #000;
+  color: var(--aq-text);
+  overflow-x: clip;
+}
+
+.ft-inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding: clamp(4.5rem, 9vw, 7.5rem) var(--container-pad) clamp(1.5rem, 3vw, 2.5rem);
+  container-type: inline-size;
+}
+
+.ft-top {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.ft-statement {
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.ft-nav {
+  display: flex;
+  gap: clamp(2.5rem, 6vw, 5rem);
+}
+
+.ft-links {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.ft-link {
+  display: inline-block;
+  font-size: 1rem;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  color: var(--aq-text-muted);
+  transition: color 0.2s ease;
+}
+
+.ft-link:hover {
+  color: var(--aq-text);
+}
+
+.ft-link:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (min-width: 768px) {
+  .ft-top {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+}
+
+/* The wordmark fills the container's width: "Aqelvio" sized from the
+   container (cqi), "Labs" set small on the same baseline, flush right. */
+.ft-wordmark {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: clamp(3.5rem, 9vw, 7rem);
+  font-family: var(--font-display);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ft-word {
+  font-size: calc(100cqi * var(--ft-fit, 0.27));
+  line-height: 1.02;
+  letter-spacing: -0.06em;
+  /* Room for the descender of "q", so nothing is clipped. */
+  padding-bottom: 0.04em;
+}
+
+.ft-labs {
+  font-size: clamp(1.25rem, 4.2cqi, 3.75rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--aq-text-muted);
+}
+
+.ft-copy {
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--aq-border-subtle);
+  font-size: 0.8125rem;
+  color: var(--aq-text-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* /services — introduction with a drifting column of service labels   */
+/* ------------------------------------------------------------------ */
+.svi {
+  padding: calc(var(--header-height) + clamp(3rem, 7vw, 6rem)) 0 clamp(4rem, 8vw, 6.5rem);
+}
+
+.svi-inner {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 3.5rem);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.svi-copy {
+  display: grid;
+  justify-items: start;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.svi-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.15rem + 3.6vw, 4.25rem);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  color: var(--aq-text);
+  overflow-wrap: break-word;
+}
+
+.svi-line {
+  display: block;
+}
+
+.svi-body {
+  max-width: 30rem;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.svi-marquee {
+  position: relative;
+  height: clamp(12rem, 22vw, 15.5rem);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(transparent, #000 24%, #000 76%, transparent);
+  mask-image: linear-gradient(transparent, #000 24%, #000 76%, transparent);
+}
+
+.svi-track {
+  display: flex;
+  flex-direction: column;
+  animation: svi-drift 32s linear infinite;
+}
+
+/* Each copy carries the gap after its last tag, so the loop has no seam. */
+.svi-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.svi-tag {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--aq-text-muted);
+}
+
+@keyframes svi-drift {
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .svi-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 26rem);
+    align-items: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svi-track {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* /services — nine panels, alternating charcoal and off-white.        */
+/* Phones: one column in reading order. Tablets: text | media.         */
+/* Desktop: title + description | media | deliverables.                */
+/* ------------------------------------------------------------------ */
+.sv {
+  padding-bottom: var(--section-space);
+}
+
+.sv-list {
+  display: grid;
+  gap: 1rem;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.sv-panel {
+  --sv-pad: clamp(1rem, 2.6vw, 2rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "head"
+    "desc"
+    "media"
+    "list"
+    "action";
+  gap: 1.5rem;
+  padding: var(--sv-pad);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 1.25rem;
+  background: #0f0f0f;
+  color: var(--aq-text);
+  transition: border-color 0.3s ease;
+}
+
+.sv-panel[data-tone="light"] {
+  border-color: rgb(0 0 0 / 0.08);
+  background: #f3f2ef;
+  color: #0b0b0b;
+}
+
+.sv-panel[data-tone="dark"]:hover {
+  border-color: rgb(255 255 255 / 0.24);
+}
+
+.sv-panel[data-tone="light"]:hover {
+  border-color: rgb(0 0 0 / 0.2);
+}
+
+.sv-head {
+  grid-area: head;
+  min-width: 0;
+}
+
+.sv-num {
+  margin-bottom: 0.75rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  color: var(--aq-text-muted);
+}
+
+.sv-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.1rem + 2.1vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.sv-desc {
+  grid-area: desc;
+  max-width: 30rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.sv-panel[data-tone="light"] :is(.sv-num, .sv-desc, .sv-label, .sv-items, .sv-source) {
+  color: #4b4b4b;
+}
+
+.sv-media {
+  grid-area: media;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.625rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.sv-frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 0.875rem;
+  background: #1a1a1a;
+}
+
+.sv-backdrop {
+  position: absolute;
+  inset: -4%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px) brightness(0.72);
+}
+
+.sv-art {
+  position: absolute;
+  inset: 0;
+}
+
+.sv-frame[data-fit="contain"] .sv-art {
+  inset: clamp(0.75rem, 6%, 1.75rem);
+}
+
+.sv-img {
+  object-fit: cover;
+}
+
+.sv-frame[data-fit="contain"] .sv-img {
+  object-fit: contain;
+}
+
+.sv-frame:has(.sv-video) {
+  aspect-ratio: 16 / 9;
+  background: #f3d236;
+}
+
+.sv-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sv-video .vp-media:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: -4px;
+}
+
+.sv-source {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--aq-text-muted);
+}
+
+.sv-deliverables {
+  grid-area: list;
+}
+
+.sv-label {
+  margin-bottom: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.sv-items {
+  display: grid;
+  gap: 0.625rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--aq-text-muted);
+}
+
+.sv-items li {
+  position: relative;
+  padding-left: 1.125rem;
+}
+
+.sv-items li::before {
+  content: "";
+  position: absolute;
+  top: 0.6em;
+  left: 0.25rem;
+  width: 0.3125rem;
+  height: 0.3125rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sv-action {
+  grid-area: action;
+}
+
+/* On off-white, the shared button's white circle and light focus ring
+   would disappear; give them the panel's dark ink instead. */
+.sv-panel[data-tone="light"] .sv-action a > span:last-child {
+  background: #0b0b0b;
+  color: #fdfcfc;
+}
+
+.sv-panel[data-tone="light"] .sv-action a:focus-visible {
+  box-shadow: none;
+  outline: 2px solid #0b0b0b;
+  outline-offset: 4px;
+}
+
+.sv-panel[data-tone="light"] .sv-video .vp-media:focus-visible {
+  outline-color: #0b0b0b;
+}
+
+/* Tablet: text column beside the media. */
+@media (min-width: 768px) {
+  .sv-panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
+      "head media"
+      "desc media"
+      "list media"
+      "action media";
+    column-gap: clamp(1.75rem, 4vw, 2.5rem);
+    row-gap: 1.75rem;
+  }
+
+  .sv-action {
+    align-self: end;
+  }
+}
+
+/* Desktop: three columns at a set height, title at the top, description
+   and action at the bottom, as the reference. */
+@media (min-width: 1024px) {
+  .sv-panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 0.58fr);
+    grid-template-rows: auto 1fr auto auto;
+    grid-template-areas:
+      "head media list"
+      ". media list"
+      "desc media list"
+      "action media list";
+    column-gap: clamp(2rem, 4vw, 3.75rem);
+    row-gap: 1.5rem;
+    min-height: 30rem;
+  }
+
+  .sv-media {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .sv-frame,
+  .sv-frame:has(.sv-video) {
+    aspect-ratio: auto;
+    min-height: 20rem;
+  }
+
+  .sv-action {
+    align-self: auto;
+  }
+}
+
+/* The narrowest phones: keep "Discuss this service" on one line. */
+@media (max-width: 359px) {
+  .sv-action a > span:first-child {
+    min-width: 0;
+    padding-inline: 1.125rem;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* /work — introduction, filters and full-width project panels.        */
+/* ------------------------------------------------------------------ */
+/* Compact introduction (reference at 1440×900: pill top 209, heading top
+   264 at 64px light, first project at 398; at 390×844: heading 40px at
+   183, first project at 291). */
+.wki {
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.875rem, 1.4vw, 1.25rem);
+  /* The header is in the page flow, so this is space below it. Bottom
+     space is small: the filter toolbar follows in flow. */
+  padding: clamp(2.25rem, 7.6vw, 6.875rem) var(--container-pad) clamp(0.75rem, 1.1vw, 1rem);
+  text-align: center;
+  background: #050505;
+}
+
+/* Narrow pill with a slowly drifting label (two copies, moved by half). */
+.wki-pill {
+  display: flex;
+  align-items: center;
+  width: 14.5rem;
+  max-width: 100%;
+  height: 1.875rem;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 0.375rem;
+  background: #0d0d0d;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.wki-track {
+  display: flex;
+  width: max-content;
+  animation: wki-drift 16s linear infinite;
+}
+
+.wki-copy {
+  display: flex;
+}
+
+.wki-word {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: #d6d6d6;
+}
+
+.wki-dot {
+  margin-inline: 0.625rem;
+  color: var(--aq-text-muted);
+}
+
+@keyframes wki-drift {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.wki-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 1.6rem + 2.6vw, 4rem);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--aq-text);
+}
+
+.wki-word-group {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* The narrowest phones: keep "Selected Works" on one line. */
+@media (max-width: 359px) {
+  .wki-heading {
+    font-size: 2.25rem;
+  }
+}
+
+/* Restrained entrance: each letter un-blurs and fades in, in turn. */
+.wki-char {
+  display: inline-block;
+  animation: wki-char 0.7s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: calc(var(--i) * 45ms + 120ms);
+}
+
+@keyframes wki-char {
+  from {
+    opacity: 0;
+    filter: blur(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wki-track {
+    margin-inline: auto;
+    animation: none;
+  }
+
+  .wki-copy + .wki-copy,
+  .wki-word:last-child .wki-dot {
+    display: none;
+  }
+
+  .wki-pill {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .wki-char {
+    animation: none;
+  }
+}
+
+.wk {
+  background: #050505;
+}
+
+/* Filters: a compact row in normal flow above the collection (never over
+   the media). On narrow screens the chips scroll inside it, not the page. */
+.wk-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: calc(100% - 2 * var(--container-pad));
+  margin: 0 auto clamp(0.875rem, 1.6vw, 1.5rem);
+  width: max-content;
+}
+
+.wk-filter-row {
+  display: flex;
+  gap: 0.125rem;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.wk-filter-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* Where the chips overflow, fade the edge so a cut-off chip reads as
+   "more to scroll" rather than broken. */
+@media (max-width: 899px) {
+  .wk-filter-row {
+    -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, #000 82%, transparent);
+  }
+}
+
+.wk-filter {
+  flex: none;
+  padding: 0.4375rem 0.875rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-size: 0.8125rem;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--aq-text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.wk-filter:hover {
+  color: var(--aq-text);
+  background: rgb(255 255 255 / 0.08);
+}
+
+.wk-filter[aria-pressed="true"] {
+  background: var(--aq-text);
+  color: #050505;
+}
+
+/* Inset, so the scrolling row can't clip the ring. */
+.wk-filter:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: -2px;
+}
+
+.wk-filter[aria-pressed="true"]:focus-visible {
+  outline-color: #050505;
+}
+
+.wk-count {
+  flex: none;
+  padding-inline: 0.5rem 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  color: var(--aq-text-muted);
+}
+
+.wk-list {
+  display: grid;
+}
+
+/* Every project: one full-width, viewport-tall image panel (as the
+   reference), with its information over the lower left. */
+.wk-panel {
+  position: relative;
+  height: 100svh;
+  min-height: 34rem;
+  overflow: hidden;
+  background: #111;
+}
+
+.wk-panel[hidden] {
+  display: none;
+}
+
+.wk-media {
+  position: absolute;
+  inset: 0;
+}
+
+/* Restrained contrast for the text: up from the bottom, in from the left. */
+.wk-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgb(5 5 5 / 0.88) 0%, rgb(5 5 5 / 0.5) 22%, rgb(5 5 5 / 0) 48%),
+    linear-gradient(to right, rgb(5 5 5 / 0.45) 0%, rgb(5 5 5 / 0) 55%);
+  pointer-events: none;
+}
+
+.wk-text {
+  position: absolute;
+  left: clamp(1.25rem, 4.4vw, 4rem);
+  right: clamp(1.25rem, 4.4vw, 4rem);
+  bottom: clamp(1.25rem, 4.5vh, 3.5rem);
+  z-index: 2;
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  max-width: 42rem;
+}
+
+.wk-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.3rem + 2.6vw, 3.75rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--aq-text);
+  overflow-wrap: break-word;
+}
+
+.wk-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.wk-char {
+  display: inline-block;
+}
+
+.wk-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wk-badge,
+.wk-status {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 0.625rem;
+  background: rgb(5 5 5 / 0.35);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--aq-text);
+}
+
+.wk-status {
+  color: var(--aq-text-muted);
+}
+
+.wk-credit {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: rgb(253 252 252 / 0.72);
+}
+
+.wk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.wk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.125rem;
+  border: 1px solid rgb(255 255 255 / 0.45);
+  border-radius: var(--radius-pill);
+  background: rgb(5 5 5 / 0.4);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--aq-text);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.wk-btn:hover {
+  border-color: var(--aq-text);
+  background: rgb(255 255 255 / 0.14);
+}
+
+.wk-btn-primary {
+  border-color: var(--aq-text);
+  background: var(--aq-text);
+  color: #050505;
+}
+
+.wk-btn-primary:hover {
+  background: #d9d8d6;
+}
+
+.wk-btn:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+.wk-note {
+  font-size: 0.875rem;
+  color: var(--aq-text-muted);
+}
+
+/* Finished artwork (posters, square posts, logos) is shown whole over its
+   blurred backdrop, centred above the text band. */
+.wk .rp-cover[data-fit="contain"] .rp-art {
+  inset: 6% 5% 30% 5%;
+}
+
+@media (min-width: 768px) {
+  .wk .rp-cover[data-fit="contain"] .rp-art {
+    inset: 6% 6% 28% 6%;
+  }
+}
+
+/* The website's own colours, lifted into a deliberate colour field. */
+.wk-panel[data-frame] .rp-backdrop {
+  filter: blur(28px) brightness(1.2) saturate(1.45);
+}
+
+/* Websites: the real screenshot, uncropped, in a browser frame centred on
+   a backdrop of the site's own colours (a phone frame on portrait
+   screens, using the phone screenshot). */
+.wk-panel[data-frame] .rp-art {
+  inset: auto;
+  /* Below the sticky header, with room for the browser bar above it. */
+  top: calc(var(--header-height) + 2.75rem);
+  left: 50%;
+  width: min(72%, calc(100svh * 0.56 * 1.6));
+  aspect-ratio: 16 / 10;
+  overflow: visible;
+  border-radius: 0 0 0.625rem 0.625rem;
+  outline: 1px solid rgb(255 255 255 / 0.14);
+  box-shadow: 0 2.5rem 5rem rgb(0 0 0 / 0.55);
+  transform: translateX(-50%);
+}
+
+.wk-panel[data-frame] .rp-art::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 1.75rem;
+  border-radius: 0.625rem 0.625rem 0 0;
+  background:
+    radial-gradient(circle at 1rem 50%, #ff5f57 0.25rem, transparent 0.27rem),
+    radial-gradient(circle at 1.75rem 50%, #febc2e 0.25rem, transparent 0.27rem),
+    radial-gradient(circle at 2.5rem 50%, #28c840 0.25rem, transparent 0.27rem),
+    #2c2c2f;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.14);
+}
+
+.wk-panel[data-frame] .rp-cover-img {
+  border-radius: 0 0 0.625rem 0.625rem;
+}
+
+@media (orientation: portrait) {
+  .wk-panel[data-frame] .rp-art {
+    top: calc(var(--header-height) + 1rem);
+    width: auto;
+    height: 54%;
+    aspect-ratio: 780 / 1688;
+    border-radius: 1.5rem;
+    outline: 0.375rem solid #111;
+  }
+
+  .wk-panel[data-frame] .rp-art::before {
+    display: none;
+  }
+
+  .wk-panel[data-frame] .rp-cover-img {
+    border-radius: 1.5rem;
+  }
+}
+
+/* The muted preview's control sits clear of the text, bottom right. */
+.wk .rp-play {
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 3;
+}
+
+/* ------------------------------------------------------------------ */
+/* /contact — "Let's [image] Talk" hero (after Qubix /contact).        */
+/* Static by default; [data-ch="scroll"] adds the hold and scaling.    */
+/* ------------------------------------------------------------------ */
+.ch {
+  position: relative;
+  background: #000;
+}
+
+.ch-stage {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 1.25rem;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding: clamp(3rem, 8vw, 6rem) var(--container-pad);
+}
+
+.ch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(0.625rem, 1.4vw, 1.25rem);
+  transform-origin: 50% 50%;
+}
+
+.ch-word {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 0.85rem + 3.2vw, 3.625rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.04em;
+  color: var(--aq-text);
+}
+
+.ch-media {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 65rem;
+  aspect-ratio: 1.64;
+  margin: 0;
+  overflow: hidden;
+  border-radius: clamp(0.5rem, 2.2vw, 2rem);
+  background: #111;
+}
+
+.ch-img {
+  object-fit: cover;
+}
+
+/* Entrance (reference): the image rises 50px and fades in. */
+@media (prefers-reduced-motion: no-preference) {
+  .ch-media {
+    animation: ch-rise 0.6s cubic-bezier(0.33, 1, 0.68, 1) 0.1s both;
+  }
+}
+
+@keyframes ch-rise {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}
+
+.ch-credit {
+  justify-self: end;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--aq-text-muted);
+}
+
+/* Desktop and tablet with motion: two viewports tall, the row held while
+   it scales from 0.6 to 1 (ContactHero). */
+[data-ch="scroll"] {
+  height: 200svh;
+}
+
+[data-ch="scroll"] .ch-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  padding-block: 0;
+}
+
+[data-ch="scroll"] .ch-media {
+  max-height: 70svh;
+}
+
+[data-ch="scroll"] .ch-credit {
+  position: absolute;
+  right: var(--container-pad);
+  bottom: 1.25rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* /contact — enquiry form.                                            */
+/* ------------------------------------------------------------------ */
+.eq {
+  background: #000;
+  padding: clamp(4rem, 9vw, 7.5rem) 0 var(--section-space);
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.eq-inner {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+@media (min-width: 1024px) {
+  .eq-inner {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+
+  .eq-intro {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+  }
+}
+
+.eq-heading {
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.3rem + 2.6vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  color: var(--aq-text);
+}
+
+.eq-heading:focus {
+  outline: none;
+}
+
+.eq-heading:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+.eq-lede {
+  max-width: 26rem;
+  margin-top: 1.25rem;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.eq-form {
+  display: grid;
+  gap: 1.75rem;
+  min-width: 0;
+}
+
+.eq-note {
+  font-size: 0.8125rem;
+  color: var(--aq-text-muted);
+}
+
+.eq-summary {
+  padding: 0.875rem 1rem;
+  border: 1px solid rgb(255 120 120 / 0.45);
+  border-radius: 0.75rem;
+  background: rgb(226 75 75 / 0.08);
+  font-size: 0.9375rem;
+  color: #ffd2d2;
+}
+
+.eq-row {
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .eq-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.eq-field {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.eq-label {
+  padding: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--aq-text);
+}
+
+.eq-optional,
+.eq-hint {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--aq-text-muted);
+}
+
+.eq-input {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 0.75rem;
+  background: #0d0d0d;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--aq-text);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.eq-input:hover {
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+.eq-input:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 2px;
+  border-color: rgb(255 255 255 / 0.5);
+}
+
+.eq-input[aria-invalid="true"] {
+  border-color: #ff7b7b;
+}
+
+.eq-textarea {
+  min-height: 10rem;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.eq-error {
+  font-size: 0.875rem;
+  color: #ff9c9c;
+}
+
+.eq-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.eq-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem 0.5rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: var(--radius-pill);
+  font-size: 0.9375rem;
+  color: var(--aq-text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.eq-chip:hover {
+  border-color: rgb(255 255 255 / 0.4);
+  color: var(--aq-text);
+}
+
+.eq-check {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #fdfcfc;
+}
+
+.eq-chip:has(.eq-check:checked) {
+  border-color: var(--aq-text);
+  background: rgb(255 255 255 / 0.08);
+  color: var(--aq-text);
+}
+
+.eq-chip:has(.eq-check:focus-visible) {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 2px;
+}
+
+.eq-services[aria-invalid="true"] .eq-chip {
+  border-color: rgb(255 123 123 / 0.6);
+}
+
+.eq-submit-row {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+}
+
+.eq-submit {
+  min-height: 3.25rem;
+  padding: 0.875rem 2rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--aq-text);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #050505;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.eq-submit:hover {
+  background: #d9d8d6;
+}
+
+.eq-submit:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+.eq-submit:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.eq-status-wrap:focus {
+  outline: none;
+}
+
+.eq-status {
+  max-width: 34rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--aq-text-muted);
+}
+
+.eq-status-ok {
+  color: #9fe0bb;
+}
+
+.eq-status-warn {
+  padding: 0.875rem 1rem;
+  border: 1px solid rgb(255 200 120 / 0.4);
+  border-radius: 0.75rem;
+  background: rgb(255 180 80 / 0.06);
+  color: #ffe3b8;
+}
+
+/* ------------------------------------------------------------------ */
+/* /about — editorial page after the Kaelorian reference.              */
+/* ------------------------------------------------------------------ */
+.ab {
+  background: #000;
+  color: var(--aq-text);
+  overflow-x: clip;
+}
+
+/* Hero: two halves of real work under an oversized wordmark. */
+.ab-hero {
+  position: relative;
+  height: calc(100svh - var(--header-height));
+  min-height: 30rem;
+  overflow: hidden;
+}
+
+.ab-hero-cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.ab-hero-half {
+  position: relative;
+  overflow: hidden;
+}
+
+.ab-hero-img {
+  object-fit: cover;
+}
+
+/* The website half: its real screenshot whole, in a browser frame, over a
+   blurred field of its own colours. */
+.ab-hero-backdrop {
+  position: absolute;
+  inset: -6%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(26px) brightness(1.1) saturate(1.4);
+}
+
+.ab-hero-frame {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  width: 78%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-top: 1.25rem solid #2c2c2f;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.14), 0 2rem 4rem rgb(0 0 0 / 0.55);
+  transform: translateX(-50%);
+}
+
+/* Contrast: dark under the wordmark, a deeper band behind the statements,
+   and the corners. */
+.ab-hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgb(0 0 0 / 0.6) 0%, rgb(0 0 0 / 0.12) 28%, rgb(0 0 0 / 0.5) 52%, rgb(0 0 0 / 0.7) 66%, rgb(0 0 0 / 0.45) 78%, rgb(0 0 0 / 0.85) 100%);
+}
+
+.ab-wordmark {
+  position: absolute;
+  top: -0.06em;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13.2vw;
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--aq-text);
+}
+
+.ab-statements {
+  position: absolute;
+  top: 60%;
+  left: var(--container-pad);
+  right: var(--container-pad);
+  z-index: 2;
+  height: 1.1em;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: clamp(1.875rem, 0.9rem + 4.1vw, 4.375rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.ab-statement {
+  position: absolute;
+  inset: 0;
+  white-space: nowrap;
+}
+
+.ab-corner {
+  position: absolute;
+  bottom: clamp(1.25rem, 4vh, 2.5rem);
+  z-index: 2;
+  max-width: 40%;
+  font-family: var(--font-display);
+  font-size: clamp(0.9375rem, 0.7rem + 0.9vw, 1.375rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.ab-corner-left {
+  left: var(--container-pad);
+}
+
+.ab-corner-right {
+  right: var(--container-pad);
+  text-align: right;
+}
+
+.ab-hero-credit {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  z-index: 2;
+  width: max-content;
+  max-width: 50%;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  text-align: center;
+  color: rgb(253 252 252 / 0.6);
+  transform: translateX(-50%);
+}
+
+/* Phones: a shorter hero (the reference's is about 60% of the screen);
+   the credit sits on its own line below the corner labels. */
+@media (max-width: 767px) {
+  .ab-hero {
+    height: min(36rem, calc(78svh - var(--header-height)));
+    min-height: 26rem;
+  }
+
+  .ab-corner {
+    bottom: 2.75rem;
+  }
+
+  .ab-hero-credit {
+    max-width: calc(100% - 2 * var(--container-pad));
+  }
+}
+
+/* Load and the statement cycle (reference timings). */
+@media (prefers-reduced-motion: no-preference) {
+  .ab-hero-cover {
+    animation: ab-cover 0.6s cubic-bezier(0.33, 1, 0.68, 1) 0.1s both;
+  }
+
+  .ab-wordmark {
+    animation: ab-drop 0.6s cubic-bezier(0.33, 1, 0.68, 1) 0.3s both;
+  }
+
+  .ab-corner {
+    animation: ab-fade 0.6s ease 0.5s both;
+  }
+
+  .ab-statement {
+    animation: ab-cycle 3.6s cubic-bezier(0.33, 1, 0.68, 1) infinite both;
+    animation-delay: calc(var(--i) * 1.2s + 0.9s);
+  }
+}
+
+@keyframes ab-cover {
+  from {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes ab-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-80px);
+  }
+}
+
+@keyframes ab-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Each statement owns a third of the loop: rise 70px through the mask
+   (0.8s), hold, fade (as text-one … text-four). */
+@keyframes ab-cycle {
+  0% {
+    opacity: 1;
+    transform: translateY(100%);
+  }
+  22% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  29% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  33.3%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab-statements {
+    top: 48%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .ab-statement {
+    position: static;
+    display: block;
+  }
+}
+
+/* Sections: numbered label row, generous space, fine dividers. */
+.ab-section {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding: clamp(4.5rem, 10vw, 9rem) var(--container-pad) 0;
+}
+
+.ab-label {
+  display: grid;
+  /* The centre label may wrap on narrow screens rather than overflow. */
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  text-align: center;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.ab-label > :first-child {
+  text-align: left;
+}
+
+.ab-label > :last-child {
+  text-align: right;
+}
+
+.ab-label-name {
+  color: var(--aq-text);
+}
+
+.ab-heading {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.2rem + 4.4vw, 5.5rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+}
+
+.ab-heading-center {
+  max-width: 16ch;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.ab-line {
+  display: block;
+}
+
+.ab-story-copy,
+.ab-approach-copy {
+  display: grid;
+  gap: 1.25em;
+  max-width: 62rem;
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 0.8rem + 1.35vw, 1.875rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+}
+
+.ab-statements-row {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: clamp(3.5rem, 7vw, 6rem);
+  padding-top: 2rem;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+}
+
+@media (min-width: 768px) {
+  .ab-statements-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ab-roll {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+.ab-roll-inner {
+  display: block;
+}
+
+/* Rows (process, values). */
+.ab-rows {
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.ab-row {
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem) 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.ab-row-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 0.9rem + 0.9vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.ab-row-text {
+  max-width: 34rem;
+  font-size: clamp(1rem, 0.9rem + 0.35vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--aq-text-muted);
+}
+
+.ab-row-index {
+  font-size: 0.8125rem;
+  color: var(--aq-text-muted);
+}
+
+@media (min-width: 768px) {
+  .ab-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    align-items: baseline;
+  }
+
+  .ab-row-value {
+    grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 1.4fr);
+  }
+}
+
+/* Founders: a sticky scene on wider screens. */
+.ab-founders {
+  position: relative;
+  padding-top: clamp(4.5rem, 10vw, 9rem);
+}
+
+.ab-founders-stage {
+  position: relative;
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.ab-giant {
+  font-family: var(--font-display);
+  /* Never wider than the container ("Two founders" is ~7.4em wide). */
+  font-size: min(12.6vw, 12.5rem);
+  font-weight: 600;
+  line-height: 0.85;
+  letter-spacing: -0.07em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #2a2a2a;
+}
+
+.ab-founder-list {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .ab-founder-list {
+    grid-template-columns: repeat(2, minmax(0, 24rem));
+    justify-content: center;
+    gap: clamp(1rem, 2.5vw, 2rem);
+  }
+}
+
+[data-ab-scene="scroll"] {
+  height: 260svh;
+  padding-top: 0;
+}
+
+[data-ab-scene="scroll"] .ab-founders-stage {
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100svh - var(--header-height));
+  grid-template-rows: auto 1fr;
+  align-content: start;
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+  overflow: hidden;
+}
+
+[data-ab-scene="scroll"] .ab-giant {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  /* "Two founders" fills the container width without clipping. */
+  font-size: min(12.6vw, 11rem);
+  pointer-events: none;
+}
+
+[data-ab-scene="scroll"] .ab-founder-list {
+  position: relative;
+  align-self: end;
+  padding-bottom: clamp(1.5rem, 4vh, 3rem);
+}
+
+.ab-founder {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 1rem;
+  background: rgb(13 13 13 / 0.92);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.ab-founder-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  background: #111;
+}
+
+.ab-founder-img {
+  object-fit: cover;
+}
+
+.ab-founder-caption {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-pill);
+  background: rgb(0 0 0 / 0.72);
+  font-size: 0.75rem;
+  color: var(--aq-text);
+}
+
+.ab-founder-text {
+  display: grid;
+  gap: 0.5rem;
+  padding: clamp(1.125rem, 2vw, 1.5rem);
+}
+
+.ab-founder-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1rem + 1vw, 1.875rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.ab-founder-role {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.ab-founder-bio {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgb(253 252 252 / 0.82);
+}
+
+/* Approach: three areas linked to the services. */
+.ab-areas {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+@media (min-width: 768px) {
+  .ab-areas {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ab-area {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 0.2);
+}
+
+.ab-area-index {
+  font-size: 0.8125rem;
+  color: var(--aq-text-muted);
+}
+
+.ab-area-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.ab-area-services {
+  display: grid;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.ab-link {
+  font-size: 1rem;
+  color: var(--aq-text-muted);
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.25);
+  text-underline-offset: 0.25em;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.ab-link:hover {
+  color: var(--aq-text);
+  text-decoration-color: currentColor;
+}
+
+.ab-link:focus-visible,
+.ab-pill:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.ab-relationship {
+  max-width: 40rem;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 1rem;
+  font-size: clamp(1rem, 0.9rem + 0.35vw, 1.25rem);
+  line-height: 1.45;
+}
+
+/* Work: three projects, editorial columns. */
+.ab-work {
+  display: grid;
+  gap: clamp(2.5rem, 4vw, 2rem);
+  margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+@media (min-width: 768px) {
+  .ab-work {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ab-work-item {
+  display: grid;
+  align-content: start;
+  gap: 0.375rem;
+}
+
+.ab-work-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #111;
+}
+
+.ab-work-img {
+  object-fit: cover;
+}
+
+.ab-work-img-contain {
+  object-fit: contain;
+  padding: 6%;
+}
+
+.ab-work-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 0.95rem + 0.6vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.ab-work-meta {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--aq-text-muted);
+}
+
+.ab-work-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.ab-work-all {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.ab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: var(--radius-pill);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.ab-pill:hover {
+  border-color: var(--aq-text);
+  background: rgb(255 255 255 / 0.08);
+}
+
+.ab > :last-child {
+  padding-bottom: var(--section-space);
+}
+
+/* ------------------------------------------------------------------ */
+/* /work/[slug] — project detail (after Origin Studio /works/gravity). */
+/* ------------------------------------------------------------------ */
+.pd {
+  background: #050505;
+  color: var(--aq-text);
+}
+
+.pd-intro {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding: clamp(1.25rem, 4.9vw, 4.375rem) var(--container-pad) clamp(2.5rem, 4.4vw, 4rem);
+  text-align: center;
+}
+
+.pd-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: clamp(0.5rem, 1.5vw, 1rem);
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+  transition: color 0.2s ease;
+}
+
+.pd-back:hover {
+  color: var(--aq-text);
+}
+
+.pd-title {
+  max-width: 18ch;
+  font-family: var(--font-display);
+  /* Reference: 80px at 1440, 58px at 390. */
+  font-size: clamp(3.25rem, 2.6rem + 2.8vw, 5rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  overflow-wrap: break-word;
+}
+
+.pd-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.pd-char {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pd-char {
+    animation: pd-char 0.6s cubic-bezier(0.33, 1, 0.68, 1) both;
+    animation-delay: calc(var(--i) * 35ms + 100ms);
+  }
+
+  .pd-lede,
+  .pd-meta,
+  .pd-cover {
+    animation: pd-in 0.8s cubic-bezier(0.33, 1, 0.68, 1) 0.35s both;
+  }
+}
+
+@keyframes pd-char {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+  }
+}
+
+@keyframes pd-in {
+  from {
+    opacity: 0;
+    filter: blur(16px);
+  }
+}
+
+.pd-lede {
+  max-width: 28rem;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  line-height: 1.6;
+  color: rgb(253 252 252 / 0.82);
+}
+
+/* Small uppercase label, a dot, the value, a fine rule beneath. */
+.pd-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem clamp(1.5rem, 3.4vw, 3rem);
+  max-width: 64rem;
+  margin: clamp(1.75rem, 3.4vw, 2.75rem) 0 0;
+}
+
+.pd-meta-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.pd-meta dt {
+  flex: none;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.pd-meta dt::after {
+  content: " •";
+}
+
+.pd-meta dd {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+/* Cover: about 80% of the width (1152 of 1440), 16:10, rounded. */
+.pd-cover {
+  position: relative;
+  width: min(80vw, 72rem);
+  aspect-ratio: 16 / 10;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #111;
+}
+
+.pd-backdrop {
+  position: absolute;
+  inset: -6%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(28px) brightness(1.1) saturate(1.4);
+}
+
+.pd-cover-art {
+  position: absolute;
+  inset: 6%;
+}
+
+.pd-img-cover {
+  object-fit: cover;
+}
+
+.pd-img-contain {
+  object-fit: contain;
+}
+
+.pd-img-top {
+  object-fit: cover;
+  object-position: 50% 0;
+}
+
+.pd-img-pad {
+  padding: 6%;
+}
+
+/* Website cover: the desktop screenshot in a browser frame, and on
+   portrait screens the phone screenshot in a phone frame. */
+.pd-browser {
+  position: absolute;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.14), 0 2rem 4rem rgb(0 0 0 / 0.5);
+}
+
+.pd-browser-desktop {
+  top: 13%;
+  left: 50%;
+  width: 76%;
+  aspect-ratio: 16 / 10;
+  border-top: 1.5rem solid #2c2c2f;
+  border-radius: 0.5rem;
+  transform: translateX(-50%);
+}
+
+.pd-browser-phone {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .pd-cover {
+    width: calc(100% - 2 * var(--container-pad));
+  }
+
+  /* Portrait boxes on phones, so posters and screenshots stay legible. */
+  .pd-cover-framed,
+  .pd-cover-contain {
+    aspect-ratio: 4 / 5;
+  }
+
+  .pd-browser-desktop {
+    display: none;
+  }
+
+  .pd-browser-phone {
+    display: block;
+    top: 7%;
+    left: 50%;
+    height: 86%;
+    aspect-ratio: 780 / 1688;
+    border-radius: 1.25rem;
+    outline: 0.3125rem solid #111;
+    transform: translateX(-50%);
+  }
+}
+
+/* Editorial body. */
+.pd-body {
+  width: min(80vw, 72rem);
+  margin-inline: auto;
+}
+
+.pd-section {
+  padding-top: clamp(3.5rem, 7vw, 5.5rem);
+}
+
+.pd-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.pd-text {
+  display: grid;
+  gap: 1rem;
+  max-width: 50rem;
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  line-height: 1.7;
+  color: var(--aq-text-muted);
+}
+
+.pd-list {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+  color: var(--aq-text-muted);
+}
+
+.pd-live {
+  margin-top: 2rem;
+}
+
+.pd-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--aq-text);
+  border-radius: var(--radius-pill);
+  background: var(--aq-text);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #050505;
+  transition: background-color 0.2s ease;
+}
+
+.pd-pill:hover {
+  background: #d9d8d6;
+}
+
+.pd-back:focus-visible,
+.pd-pill:focus-visible,
+.pd-next-card:focus-visible,
+.pd-enlarge:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+/* Gallery. */
+.pd-gallery {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pd-row-pair {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .pd-row-pair {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pd-row-single .pd-tile-tall {
+    width: calc(50% - 0.5rem);
+    margin-inline: auto;
+  }
+}
+
+.pd-tile {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: #111;
+}
+
+/* Portrait and square artwork: a tall box (the reference's 568×720),
+   artwork contained so it is never cropped. */
+.pd-tile-tall {
+  aspect-ratio: 568 / 720;
+}
+
+.pd-tile-video {
+  background: #000;
+}
+
+.pd-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pd-enlarge {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 50%;
+  background: rgb(5 5 5 / 0.7);
+  color: var(--aq-text);
+  cursor: zoom-in;
+  transition: background-color 0.2s ease;
+}
+
+.pd-enlarge:hover {
+  background: rgb(5 5 5 / 0.9);
+}
+
+/* Next project. */
+.pd-next {
+  display: grid;
+  gap: 2rem;
+  width: min(80vw, 72rem);
+  margin: clamp(4.5rem, 9vw, 7.5rem) auto 0;
+  padding-bottom: var(--section-space);
+}
+
+.pd-back-end {
+  justify-self: start;
+}
+
+.pd-next-card {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.pd-next-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.pd-next-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.3rem + 2.6vw, 3.75rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.pd-next-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 7;
+  margin-top: 1rem;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #111;
+}
+
+.pd-next-img {
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.pd-next-img-contain {
+  object-fit: contain;
+  padding: 4%;
+}
+
+.pd-next-card:hover .pd-next-img {
+  transform: scale(1.03);
+}
+
+@media (max-width: 767px) {
+  .pd-body,
+  .pd-next {
+    width: auto;
+    margin-inline: var(--container-pad);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* /pricing — Pricing & Engagement. Editorial sections over fine rules, */
+/* the site's display type and pills; reveals in PricingReveal.         */
+/* ------------------------------------------------------------------ */
+.pr-hero,
+.pr-section {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.pr-hero {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  padding-top: calc(var(--header-height) + clamp(3rem, 8vw, 7rem));
+  padding-bottom: clamp(2rem, 5vw, 4rem);
+}
+
+.pr-eyebrow,
+.pr-label,
+.pr-small-label,
+.pr-option-tag,
+.pr-cost-frequency {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.pr-title {
+  max-width: 16ch;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 1.2rem + 5.6vw, 6.75rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  color: var(--aq-text);
+}
+
+.pr-title-line {
+  display: block;
+}
+
+.pr-hero-copy {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 36rem;
+  margin-left: auto;
+}
+
+.pr-lede {
+  font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.3125rem);
+  line-height: 1.5;
+  color: rgb(253 252 252 / 0.86);
+}
+
+.pr-hero-note {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.pr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.75rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pr-eyebrow,
+  .pr-title-line {
+    animation: pd-char 0.9s cubic-bezier(0.33, 1, 0.68, 1) both;
+  }
+
+  .pr-title-line + .pr-title-line {
+    animation-delay: 0.12s;
+  }
+
+  .pr-hero .pr-title-line {
+    animation-name: pd-in;
+  }
+
+  .pr-hero-copy {
+    animation: pd-in 0.8s cubic-bezier(0.33, 1, 0.68, 1) 0.3s both;
+  }
+
+  .pr-section .pr-title-line {
+    animation: none;
+  }
+}
+
+.pr-section {
+  padding-top: clamp(4.5rem, 10vw, 8.5rem);
+}
+
+.pr-section-tight {
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.pr-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.pr-label-name {
+  color: var(--aq-text);
+}
+
+.pr-heading {
+  max-width: 20ch;
+  margin-top: clamp(2rem, 4vw, 3.25rem);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.2rem + 3vw, 4rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  color: var(--aq-text);
+  overflow-wrap: break-word;
+}
+
+.pr-heading-wide {
+  max-width: 24ch;
+}
+
+.pr-muted {
+  color: var(--aq-text-muted);
+}
+
+.pr-subheading,
+.pr-small-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1rem + 0.9vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--aq-text);
+}
+
+.pr-small-heading {
+  font-size: 1.125rem;
+}
+
+.pr-text {
+  max-width: 34rem;
+  margin-top: 1.25rem;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--aq-text-muted);
+}
+
+.pr-fine {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.pr-link {
+  color: var(--aq-text);
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.35);
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.pr-link:hover {
+  text-decoration-color: currentColor;
+}
+
+.pr-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--aq-text);
+  border-radius: var(--radius-pill);
+  background: var(--aq-text);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #050505;
+  transition: background-color 0.2s ease;
+}
+
+.pr-pill:hover {
+  background: #d9d8d6;
+}
+
+.pr-link:focus-visible,
+.pr-pill:focus-visible,
+.pr-offering-summary:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+/* Ticked lists (models, hosting options). */
+.pr-checks {
+  display: grid;
+  gap: 0.625rem;
+  margin-top: 0.875rem;
+}
+
+.pr-checks li {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: rgb(253 252 252 / 0.86);
+}
+
+.pr-checks svg {
+  margin-top: 0.15rem;
+  color: var(--aq-accent);
+}
+
+/* Engagement models. */
+.pr-models {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 1024px) {
+  .pr-models {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pr-model {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.5rem, 2.6vw, 2.25rem);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: var(--radius-card);
+  background: var(--aq-surface);
+}
+
+.pr-model-number {
+  font-size: 0.8125rem;
+  color: var(--aq-text-muted);
+}
+
+.pr-model-title {
+  margin-top: 2.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 1.2rem + 1.2vw, 2.25rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: var(--aq-text);
+}
+
+.pr-model-for {
+  margin: 0.75rem 0 1.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--aq-text-muted);
+}
+
+.pr-model-foot {
+  display: grid;
+  justify-items: start;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgb(255 255 255 / 0.1);
+}
+
+.pr-model .pr-checks {
+  margin-bottom: 1.75rem;
+}
+
+.pr-model-price {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--aq-text);
+}
+
+.pr-model-note {
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--aq-text-muted);
+}
+
+/* Comparison: a table on wider screens; on phones each criterion becomes
+   a block listing the three models' answers. */
+.pr-table-wrap {
+  margin-top: 1.5rem;
+}
+
+.pr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.pr-table th,
+.pr-table td {
+  padding: 1rem 1rem 1rem 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  text-align: left;
+  vertical-align: top;
+}
+
+.pr-table thead th {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--aq-text);
+}
+
+.pr-table tbody th {
+  width: 22%;
+  font-weight: 500;
+  color: var(--aq-text);
+}
+
+.pr-table td {
+  color: var(--aq-text-muted);
+}
+
+@media (max-width: 767px) {
+  .pr-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .pr-table,
+  .pr-table tbody,
+  .pr-table tr,
+  .pr-table th,
+  .pr-table td {
+    display: block;
+    width: auto;
+  }
+
+  .pr-table tr {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  .pr-table th,
+  .pr-table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .pr-table tbody th {
+    width: auto;
+    margin-bottom: 0.5rem;
+  }
+
+  .pr-table td {
+    padding-top: 0.375rem;
+  }
+
+  .pr-table td::before {
+    content: attr(data-label) ": ";
+    color: var(--aq-text);
+  }
+}
+
+/* Split: heading column + content column. */
+.pr-split {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 1024px) {
+  .pr-split {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: start;
+  }
+
+  .pr-split > :first-child {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+  }
+}
+
+.pr-rows {
+  margin-top: clamp(0rem, 4vw, 3.25rem);
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.pr-row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 0.25rem 0.5rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.pr-row-index {
+  grid-row: span 2;
+  font-size: 0.8125rem;
+  color: var(--aq-text-muted);
+  padding-top: 0.25rem;
+}
+
+.pr-row-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.375rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--aq-text);
+}
+
+.pr-row-text {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--aq-text-muted);
+}
+
+.pr-notes {
+  display: grid;
+  gap: 1rem;
+  max-width: 48rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  margin-left: auto;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--aq-accent);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgb(253 252 252 / 0.86);
+}
+
+/* Running costs: a lighter band to stand out. */
+.pr-band {
+  margin-top: clamp(2rem, 4vw, 3rem);
+  padding: clamp(1.75rem, 4vw, 3.5rem);
+  border-radius: var(--radius-panel);
+  background: #f2f1ef;
+  color: #0b0b0b;
+}
+
+.pr-band .pr-heading {
+  margin-top: 0;
+  color: #0b0b0b;
+}
+
+.pr-band .pr-muted,
+.pr-band .pr-text,
+.pr-band .pr-fine,
+.pr-band .pr-cost-frequency,
+.pr-band .pr-cost-index {
+  color: #5a5a5a;
+}
+
+.pr-costs {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 900px) {
+  .pr-costs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pr-cost {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(0 0 0 / 0.16);
+}
+
+.pr-cost-index {
+  font-size: 0.8125rem;
+}
+
+.pr-cost-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1.1rem + 0.8vw, 1.875rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.pr-cost-text {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: #2a2a2a;
+}
+
+.pr-changes {
+  margin-top: clamp(2rem, 4vw, 3rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(0 0 0 / 0.16);
+}
+
+.pr-band .pr-small-heading {
+  color: #0b0b0b;
+}
+
+.pr-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pr-tags li {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  color: rgb(253 252 252 / 0.86);
+}
+
+.pr-band .pr-tags li {
+  border-color: rgb(0 0 0 / 0.18);
+  color: #1a1a1a;
+}
+
+/* Hosting options. */
+.pr-options {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 900px) {
+  .pr-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.pr-option {
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: var(--radius-card);
+  background: var(--aq-surface);
+}
+
+.pr-option-title {
+  margin-top: 1.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.15rem + 1vw, 2.125rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: var(--aq-text);
+}
+
+.pr-option-tag {
+  color: var(--aq-accent);
+}
+
+.pr-agreement {
+  margin-top: 1.5rem;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  border: 1px dashed rgb(255 255 255 / 0.2);
+  border-radius: var(--radius-card);
+}
+
+/* Process. */
+.pr-steps-path {
+  margin-top: 1.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 0.85rem + 0.6vw, 1.375rem);
+  letter-spacing: -0.02em;
+  color: var(--aq-text-muted);
+}
+
+.pr-steps {
+  display: grid;
+  gap: 0 1.5rem;
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+}
+
+@media (min-width: 768px) {
+  .pr-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .pr-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.pr-step {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.pr-step-index {
+  font-size: 0.8125rem;
+  color: var(--aq-accent);
+}
+
+.pr-step-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1.1rem + 0.8vw, 1.875rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: var(--aq-text);
+}
+
+.pr-step-text {
+  max-width: 22rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.pr-proposal {
+  max-width: 44rem;
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 0.95rem + 0.7vw, 1.5rem);
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  color: var(--aq-text);
+}
+
+/* Services and pricing models: collapsed rows. */
+.pr-offerings {
+  margin-top: clamp(0rem, 4vw, 3.25rem);
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.pr-offering {
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.pr-offering-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 1rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.pr-offering-summary::-webkit-details-marker {
+  display: none;
+}
+
+.pr-offering-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.375rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--aq-text);
+}
+
+.pr-offering-price {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  color: var(--aq-text-muted);
+}
+
+.pr-offering-icon {
+  position: relative;
+  width: 1rem;
+  height: 1rem;
+  color: var(--aq-text);
+}
+
+.pr-offering[open] .faq-line-v {
+  transform: rotate(180deg);
+}
+
+.pr-offering-body {
+  display: grid;
+  justify-items: start;
+  gap: 1.25rem;
+  padding: 0 0 1.75rem;
+}
+
+.pr-offering-text {
+  max-width: 36rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: rgb(253 252 252 / 0.86);
+}
+
+.pr-collab {
+  max-width: 36rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--aq-accent);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.pr-offering-meta {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .pr-offering-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pr-offering-meta dt {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.pr-offering-meta dd {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--aq-text);
+}
+
+.pr-mini-list {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.pr-mini-list li {
+  display: grid;
+  grid-template-columns: 0.875rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.pr-mini-list svg {
+  margin-top: 0.2rem;
+  color: var(--aq-text-muted);
+}
+
+.pr-faq-more {
+  margin-top: 2rem;
+  text-align: center;
+  color: var(--aq-text-muted);
+}
+
+/* A small "how pricing works" pointer used on other pages. */
+.pricing-pointer {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--aq-text-muted);
+}
+
+.pricing-pointer a {
+  color: var(--aq-text);
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.35);
+  text-underline-offset: 0.22em;
+}
+
+.pricing-pointer a:hover {
+  text-decoration-color: currentColor;
+}
+
+.pricing-pointer a:focus-visible {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 3px;
+}
+
+/* /services — categories overview (ServiceCategories) and the heading
+   above the design panels. */
+.svc,
+.sv-head-block {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.svc {
+  padding-bottom: clamp(4.5rem, 10vw, 8rem);
+}
+
+.sv-head-block {
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.svc-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 768px) {
+  .svc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .svc-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.svc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: clamp(1.5rem, 2.6vw, 2.25rem);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: var(--radius-card);
+  background: var(--aq-surface);
+  scroll-margin-top: calc(var(--header-height) + 1rem);
+}
+
+.svc-index {
+  font-size: 0.8125rem;
+  color: var(--aq-text-muted);
+}
+
+.svc-title {
+  margin-top: 1.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.15rem + 1vw, 2rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: var(--aq-text);
+}
+
+.svc-summary {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--aq-text-muted);
+}
+
+.svc-offerings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.svc-offerings li {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  color: rgb(253 252 252 / 0.86);
+}
+
+.svc-collab {
+  margin-top: auto;
+  padding-top: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--aq-accent);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--aq-text-muted);
+}
+
+.svc-more {
+  font-size: 0.9375rem;
+}
+
+.svc-pointer {
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+/* Enquiry form additions: spam trap, select, consent, pricing pointer. */
+.eq-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.eq-select {
+  appearance: none;
+  padding-right: 2.75rem;
+  background-image: linear-gradient(45deg, transparent 50%, #a1a1a1 50%), linear-gradient(135deg, #a1a1a1 50%, transparent 50%);
+  background-position: calc(100% - 1.4rem) 55%, calc(100% - 1rem) 55%;
+  background-size: 0.4rem 0.4rem;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.eq-select:invalid,
+.eq-select option[value=""] {
+  color: var(--aq-text-muted);
+}
+
+.eq-input-short {
+  max-width: 20rem;
+}
+
+.eq-privacy {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 0.02);
+}
+
+.eq-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--aq-text);
+  cursor: pointer;
+}
+
+.eq-consent .eq-check {
+  margin-top: 0.2rem;
+}
+
+.eq-consent:has(.eq-check:focus-visible) {
+  outline: 2px solid var(--aq-focus);
+  outline-offset: 4px;
+  border-radius: 0.25rem;
+}
+
+.eq-consent:has([aria-invalid="true"]) {
+  color: #ffb3b3;
+}
+
+.eq-pointer {
+  margin-top: 1rem;
+}
+
+.faq-pointer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.wk-pricing {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem) var(--container-pad) clamp(3rem, 6vw, 5rem);
+  text-align: center;
+}

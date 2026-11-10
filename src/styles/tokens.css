@@ -1,0 +1,92 @@
+/*
+  Aqelvio Labs design tokens.
+
+  Color values below were read from computed CSS custom properties on
+  https://qubix-flowdevz.webflow.io/ on 14 Oct 2026. They are verified
+  reference values, not guesses. The orange accent is used sparingly —
+  it is not a primary brand flood color.
+*/
+
+:root {
+  /* Verified from Qubix --_color---normal-color--black / body background */
+  --aq-bg: #000000;
+  /* Verified --_color---normal-color--deep-charcoal */
+  --aq-surface: #0f0f0f;
+  /* Verified --_color---normal-color--soft-black */
+  --aq-elevated: #1c1c1c;
+  /* Verified --_color---normal-color--near-black */
+  --aq-elevated-2: #222222;
+  /* Verified --_color---normal-color--gunmetal */
+  --aq-gunmetal: #1d1d1d;
+  /* Menu number badge sampled from computed style */
+  --aq-hover: #393939;
+
+  /* Verified --_color---text-color--text-color / snow-white */
+  --aq-text: #fdfcfc;
+  /* Verified --_color---text-color--paragraph-color / medium-gray */
+  --aq-text-muted: #a1a1a1;
+  --aq-text-subtle: color-mix(in srgb, var(--aq-text-muted) 70%, transparent);
+
+  /* Verified --_color---normal-color--vivid-orange — used as a restrained accent */
+  --aq-accent: #fe6512;
+  /* Verified --_color---normal-color--frosted-white */
+  --aq-border: #ffffff42;
+  --aq-border-subtle: color-mix(in srgb, #ffffff 10%, transparent);
+
+  --aq-focus: #fdfcfc;
+  --aq-error: #e24b4b;
+  --aq-success: #3d9a6a;
+
+  --aq-text-display: clamp(2.5rem, 1.85rem + 3.1vw, 4.35rem);
+  --aq-text-h1: clamp(2.25rem, 4vw + 1rem, 3.625rem);
+  --text-h2: clamp(1.75rem, 2.4vw + 1rem, 2.75rem);
+  --text-h3: clamp(1.25rem, 1.2vw + 0.8rem, 1.75rem);
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-label: 0.75rem;
+
+  --leading-display: 1.05;
+  --leading-heading: 1.18;
+  --leading-body: 1.5;
+  --tracking-display: -0.04em;
+  --tracking-heading: -0.03em;
+  --tracking-label: 0.14em;
+
+  --container-max: 1360px;
+  --container-pad: clamp(1.25rem, 4vw, 2.5rem);
+  --section-space: clamp(5rem, 10vw, 7.5rem);
+  /* Rendered header: pt-6 + pb-3 + 1px border + tallest control. Below sm
+     that is the 3.5rem menu trigger; from sm the CTA pill (2 x 1.05rem
+     padding + 1.5rem line) is taller. Keep in sync with Header/Button. */
+  --header-height: calc(2.25rem + 1px + 3.5rem);
+  --grid-gap: 1.5rem;
+
+  --radius-pill: 200px;
+  --radius-card: 16px;
+  --radius-panel: 24px;
+  --radius-control: 70px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.15, 1);
+  --duration-fast: 200ms;
+  --duration-mid: 320ms;
+  --duration-reveal: 620ms;
+  --duration-headline: 760ms;
+
+  --shadow-header: 0 12px 40px rgb(0 0 0 / 0.35);
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --header-height: calc(2.25rem + 1px + 2.1rem + 1.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 1ms;
+    --duration-mid: 1ms;
+    --duration-reveal: 1ms;
+    --duration-headline: 1ms;
+  }
+}

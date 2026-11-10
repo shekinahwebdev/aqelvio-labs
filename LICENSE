@@ -1,21 +1,33 @@
-MIT License
+Copyright (c) 2026 Patricia Shiloh Kanneh. All Rights Reserved.
 
-Copyright (c) 2026 Patricia Shiloh Kanneh
+PROPRIETARY AND CONFIDENTIAL
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+The Aqelvio Labs website, this software repository, and all related materials
+—including source code, object code, design files, layouts, typography,
+animations, copy, trademarks, trade dress, logos, and compiled assets—are owned
+by the copyright holder and protected by copyright, trademark, and other
+intellectual property laws.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+You may view the public website and clone this repository only for your own
+private reference. You may not, without prior written permission from the
+copyright holder:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+  • copy, reproduce, or redistribute any substantial portion of the code or
+    design;
+  • publish, mirror, or host a derivative version of this site or repository;
+  • scrape, harvest, or systematically download content for republication;
+  • remove or alter copyright, trademark, or proprietary notices;
+  • use the Aqelvio name, branding, or project portfolio in a way that suggests
+    affiliation or endorsement.
+
+Third-party materials (for example, open-source dependencies and separately
+licensed stock photography credited on the site) remain subject to their own
+licenses. Those licenses do not extend to the original expression, design
+system, or codebase of Aqelvio Labs.
+
+THE SOFTWARE AND MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+THE COPYRIGHT HOLDER SHALL NOT BE LIABLE FOR ANY CLAIM ARISING FROM
+UNAUTHORIZED USE OR MISAPPROPRIATION BY THIRD PARTIES.
+
+Licensing or permission requests: contact via https://github.com/shekinahwebdev/aqelvio-labs
+or the enquiry form on the live website when published.

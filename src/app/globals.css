@@ -1855,6 +1855,146 @@ body {
   color: var(--aq-text-muted);
 }
 
+.ft-copy-link {
+  margin-inline-start: 0.25rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* ------------------------------------------------------------------ */
+/* /legal — copyright and acceptable use                               */
+/* ------------------------------------------------------------------ */
+.lg {
+  padding: calc(var(--header-height) + clamp(2.5rem, 6vw, 4rem)) 0 clamp(4rem, 8vw, 6rem);
+}
+
+.lg-inner {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  max-width: 42rem;
+}
+
+.lg-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.lg-title {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.lg-lead {
+  margin-top: 1rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--aq-text-muted);
+}
+
+.lg-updated {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--aq-text-muted);
+}
+
+.lg-notice {
+  padding: 1.25rem 1.35rem;
+  border: 1px solid var(--aq-border-subtle);
+  border-radius: var(--radius-lg, 0.75rem);
+  background: var(--aq-elevated-2, color-mix(in srgb, var(--aq-foreground) 4%, transparent));
+}
+
+.lg-notice-title {
+  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lg-notice p {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.lg-toc-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--aq-text-muted);
+}
+
+.lg-toc-list {
+  margin-top: 0.65rem;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9375rem;
+}
+
+.lg-toc-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.lg-toc-link:hover {
+  color: var(--aq-text-muted);
+}
+
+.lg-body {
+  display: grid;
+  gap: clamp(2rem, 4vw, 2.75rem);
+}
+
+.lg-h2 {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  letter-spacing: -0.02em;
+}
+
+.lg-p {
+  margin-top: 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--aq-foreground) 88%, transparent);
+}
+
+.lg-ul {
+  margin-top: 0.75rem;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  list-style: disc;
+}
+
+.lg-footer {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--aq-border-subtle);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--aq-text-muted);
+}
+
+.lg-inline-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.lg-inline-link:hover {
+  color: var(--aq-foreground);
+}
+
 /* ------------------------------------------------------------------ */
 /* /services — introduction with a drifting column of service labels   */
 /* ------------------------------------------------------------------ */

@@ -45,6 +45,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  other: {
+    copyright: `© ${site.legalName}. All rights reserved.`,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

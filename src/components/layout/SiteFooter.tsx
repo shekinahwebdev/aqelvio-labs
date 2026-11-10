@@ -60,7 +60,10 @@ export function SiteFooter() {
         </p>
 
         <p className="ft-copy">
-          © <CopyrightYear /> {site.legalName}
+          © <CopyrightYear /> {site.legalName}. All rights reserved.{" "}
+          <FooterLink href="/legal" className="ft-link ft-copy-link">
+            Legal &amp; copyright
+          </FooterLink>
         </p>
       </div>
     </footer>
